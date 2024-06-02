@@ -2,10 +2,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// cSpell:disable
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+//* cSpell:enable */
 
 enum UserRole {
   STUDENT
@@ -55,4 +58,21 @@ model Answer {
   question     Question  @relation(fields: [questionId], references: [id])
 
   @@map("answers")
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("comments")
+}
+
+model Attachment {
+  id        String    @id @default(uuid())
+  title     String
+  url       String
+
+  @@map("attachments")
 }
