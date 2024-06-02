@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
   "name": "Lucas Davi",
-  "email": "lucas33@gmail.com",
+  "email": "lucas34@gmail.com",
   "password": "12345"
 }
 
@@ -31,13 +31,13 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-  "title": "Nova Pergunta 2",
-  "content": "Conteúdo da pergunta 2"
+  "title": "Nova Pergunta 3",
+  "content": "Conteúdo da pergunta 3"
 }
 
 ###
 
 # @name fetch_recent_questions
-GET {{baseUrl}}/questions?page=2
+GET {{baseUrl}}/questions?page=1
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
