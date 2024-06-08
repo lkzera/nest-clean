@@ -30,7 +30,7 @@ describe('Upload attachment (E2E)', () => {
   test.skip('[POST] /attachments', async () => {
     const user = await studentFactory.makePrismaStudent();
     const access_token = jwt.sign({ sub: user.id.toString() });
-    console.log(process.env.AWS_BUCKET_NAME);
+
     const response = await request(app.getHttpServer())
       .post('/attachments')
       .set('Authorization', `Bearer ${access_token}`)
