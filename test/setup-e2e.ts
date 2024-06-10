@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { config } from 'dotenv';
 import { execSync } from 'node:child_process';
+import { DomainEvents } from '@/core/events/domain-events';
 
 config({ path: '.env', override: true });
 config({ path: '.env.test', override: true });
@@ -23,8 +24,10 @@ function generateUniqueDatabaseUrl(schemaId: string) {
 const schemaId = randomUUID();
 
 beforeAll(async () => {
-  const dabaseUrl = generateUniqueDatabaseUrl(schemaId);
-  process.env.DATABASE_URL = dabaseUrl;
+  const databaseUrl = generateUniqueDatabaseUrl(schemaId);
+  process.env.DATABASE_URL = databaseUrl;
+
+  DomainEvents.shouldRun = false;
   execSync('yarn prisma migrate deploy');
 });
 
