@@ -19,7 +19,7 @@ POST {{baseUrl}}/sessions
 Content-Type: application/json
 
 {
-  "email": "lucas33@gmail.com",
+  "email": "lucas34@gmail.com",
   "password": "12345"
 }
 
@@ -32,7 +32,8 @@ Authorization: Bearer {{authToken}}
 
 {
   "title": "Nova Pergunta 3",
-  "content": "Conteúdo da pergunta 3"
+  "content": "Conteúdo da pergunta 3",
+  "attachments": ["1", "2"]
 }
 
 ###
