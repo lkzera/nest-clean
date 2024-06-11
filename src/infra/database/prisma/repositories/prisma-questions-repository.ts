@@ -8,11 +8,13 @@ import { QuestionAttachmentsRepository } from '@/domain/forum/application/reposi
 import { QuestionDetails } from '@/domain/forum/enterprise/entities/value-objects/question-details';
 import { PrismaQuestionDetailsMapper } from '../mappers/prisma-question-details-mapper';
 import { DomainEvents } from '@/core/events/domain-events';
+import { CacheRepository } from '@/infra/cache/cache-repository';
 
 @Injectable()
 export class PrismaQuestionsRepository implements QuestionsRepository {
   constructor(
     private readonly _prisma: PrismaService,
+    private readonly _cache: CacheRepository,
     private readonly _questionAttachmentsRepository: QuestionAttachmentsRepository
   ) { }
 
@@ -33,6 +35,14 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
   }
 
   async findBySlugDetails(slug: string): Promise<QuestionDetails | null> {
+    const cacheHit = await this._cache.get(`questions:${slug}:details`);
+
+    if (cacheHit) {
+      const cacheData = JSON.parse(cacheHit);
+
+      return PrismaQuestionDetailsMapper.toDomain(cacheData);
+    }
+
     const question = await this._prisma.question.findUnique({
       where: {
         slug
@@ -45,7 +55,10 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
     if (!question) {
       return null;
     }
-    return PrismaQuestionDetailsMapper.toDomain(question);
+
+    await this._cache.set(`questions:${slug}:details`, JSON.stringify(question));
+    const questionDetails = PrismaQuestionDetailsMapper.toDomain(question);
+    return questionDetails;
   }
 
   async findManyRecent({ page }: PaginationParams): Promise<Question[]> {
@@ -76,6 +89,7 @@ export class PrismaQuestionsRepository implements QuestionsRepository {
         this._prisma.question.update({ where: { id: data.id }, data }),
         this._questionAttachmentsRepository.createMany(question.attachments.getNewItems()),
         this._questionAttachmentsRepository.deleteMany(question.attachments.getRemovedItems()),
+        this._cache.delete(`questions:${data.slug}:details`)
       ]);
 
     DomainEvents.dispatchEventsForAggregate(question.id);
